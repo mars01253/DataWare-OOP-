@@ -42,6 +42,93 @@ class user
         $input = $stmt->execute([$this->img]);
     }
 }
+class owner extends user
+{
+    private $id;
+    private $name;
+    private $projectmanager;
+    private $projectdesc;
+    private $deadline;
+    public function __construct($id, $name = '', $projectmanager = '', $projectdesc = '', $deadline = '')
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->projectmanager = $projectmanager;
+        $this->projectdesc = $projectdesc;
+        $this->deadline = $deadline;
+    }
+    function modify()
+    {
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'UPDATE projects 
+        SET project_name = ?, project_deadline = ?, project_desc = ? , project_manager = ?
+        WHERE project_id = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->name, $this->deadline,  $this->projectdesc, $this->projectmanager, $this->id]);
+    }
+    function delete()
+    {
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'DELETE FROM projects WHERE project_id = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->id]);
+    }
+}
+class scrum extends user
+{
+    private $id;
+    private $name;
+    private $projectmanager;
+    private $projectdesc;
+    private $deadline;
+    public function __construct($id = 0, $name = '', $projectmanager = '', $projectdesc = '', $deadline = '')
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->projectmanager = $projectmanager;
+        $this->projectdesc = $projectdesc;
+        $this->deadline = $deadline;
+    }
+    function add()
+    {
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'INSERT into teams(team_name , team_status, scrum_id ,pro_id) Values(?,?,?,?)';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->name, 'active', $this->id, $this->projectmanager]);
+    }
+    function modify()
+    {
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'UPDATE projects 
+        SET project_name = ?, project_deadline = ?, project_desc = ? , project_manager = ?
+        WHERE project_id = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->name, $this->deadline,  $this->projectdesc, $this->projectmanager, $this->id]);
+    }
+    function delete()
+    {
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'DELETE FROM projects WHERE project_id = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->id]);
+    }
+    function display($scrumid)
+    {
+        $this->id = $scrumid;
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'SELECT * FROM teams WHERE scrum_id = ?';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
+}
 class UserLog
 {
 
@@ -80,7 +167,7 @@ class UserLog
                         header('location:scrum.php');
                         $_SESSION['role'] = $userrole;
                         break;
-                    case 'owner':
+                    case 'Product Owner':
                         header('location:owner.php');
                         $_SESSION['role'] = $userrole;
                         break;
@@ -105,7 +192,7 @@ class userlogout
         $sql = 'SELECT * FROM users WHERE user_role <> "admin"';
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-            echo '<div class="mb-16">
+        echo '<div class="mb-16">
                 <dh-component>
                     <div class="container flex justify-center mx-auto pt-16">
                         <div>
@@ -115,15 +202,15 @@ class userlogout
                     </div>
                 
                         <section class = "flex flex-row flex-wrap justify-between items-center mt-10">';
-                        $i=0;
-            while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $name = $result['user_fullname'];   
-                $img = $result['user_img'];
-                $id = $result['user_id'];
-                $email = $result['user_email'];
-                $role = $result['user_role'];
-                $status = $result['user_status'];
-                echo "
+        $i = 0;
+        while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $name = $result['user_fullname'];
+            $img = $result['user_img'];
+            $id = $result['user_id'];
+            $email = $result['user_email'];
+            $role = $result['user_role'];
+            $status = $result['user_status'];
+            echo "
                 <div role='listitem' class='xl:w-1/3 sm:w-3/4 md:w-2/5 relative mt-16 mb-32 sm:mb-24 xl:max-w-sm lg:w-2/5'>
                     <div class='rounded overflow-hidden shadow-md bg-white'>
                         <div class='absolute -mt-20 w-full flex justify-center'>
@@ -131,7 +218,7 @@ class userlogout
                                 <img src='$img'  class='rounded-full object-cover h-full w-full shadow-md' />
                             </div>
                         </div>";
-                echo "<div class='px-6 mt-16'>
+            echo "<div class='px-6 mt-16'>
                             <h1 class='font-bold text-3xl text-center mb-1'>$name</h1>
                             <p class='text-gray-800 text-sm text-center'>$role</p>
                             <p class='text-gray-800 text-sm text-center'>$status</p>
@@ -144,22 +231,25 @@ class userlogout
                 
             </div>";
             $i++;
-            }
-            echo ' </section>   
+        }
+        echo ' </section>   
             </div>
                 </div>
                 
              ';
-        }
-        function logout($logout)
-        {
-            if ($logout) {
-                session_start();
-                session_unset();
-                session_destroy();
-                header('location:login.php');
-            }
+    }
+    function logout($logout)
+    {
+        if ($logout) {
+            session_start();
+            session_unset();
+            session_destroy();
+            header('location: login.php');
         }
     }
+    function displaypro($ownerid)
+    {
+    }
+}
 
 $userlogout = new userlogout;
