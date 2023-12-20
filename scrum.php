@@ -1,5 +1,7 @@
 <?php
 require 'user.php';
+$user = new user();
+$user->checklog();
 require 'view/scrumview.php';
 $id = $_SESSION['user_id'];
 $name = "";
@@ -19,7 +21,7 @@ if (isset($_POST['submit'])) {
         exit;
 
 }if(isset($_POST['delete'])){
-    $i=$_POST['index2'];
+    $i=$_POST['index'];
     $teamid=$_POST['teamid'.$i];
     $scrum = new scrum($teamid);
     $scrum->delete($teamid);
@@ -38,6 +40,5 @@ $logout = "";
     
     if(isset($_POST['logout'])){
         $logout=$_POST['logout'];
-        $userlogout->checklog();
-        $userlogout->logout($logout);
+        $user->logout($logout);
     }

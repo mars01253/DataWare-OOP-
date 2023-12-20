@@ -1,10 +1,10 @@
 <?php 
 require 'user.php';
-
+$user = new user();
+$user->checklog();
 require 'memdashview.php';
 $logout = "";
 if(isset($_POST['logout'])){
     $logout=$_POST['logout'];
-    $userlogout->checklog();
-    $userlogout->logout($logout);
+    $user->logout($logout);
 }

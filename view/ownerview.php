@@ -1,3 +1,8 @@
+<?php
+$user = new user();
+$user->checklog();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 

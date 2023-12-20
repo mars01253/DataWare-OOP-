@@ -7,7 +7,7 @@ class user
     private $pass;
     private $email;
     private $img;
-    public function __construct($fullname, $email, $pass, $img = "")
+    public function __construct($fullname = '', $email = '', $pass = '', $img = "")
     {
         $this->fullname = filter_var($fullname, FILTER_SANITIZE_SPECIAL_CHARS);
         $this->email = filter_var($email, FILTER_SANITIZE_EMAIL);
@@ -40,6 +40,22 @@ class user
         $sql = 'INSERT INTO users(user_img) values(?)';
         $stmt = $pdo->prepare($sql);
         $input = $stmt->execute([$this->img]);
+    }
+    function checklog()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('location:login.php');
+            exit();
+        }
+    }
+    function logout($logout)
+    {
+        if ($logout) {
+            session_start();
+            session_unset();
+            session_destroy();
+            header('location: login.php');
+        }
     }
 }
 class owner extends user
@@ -172,22 +188,26 @@ class member extends user
     public function __construct($userid = 0)
     {
         $this->userid = $userid;
-       
     }
     function displaymem($userid)
     {
         $this->userid = $userid;
         $conn = new Connection();
         $pdo = $conn->pdo;
-        $sql = '   SELECT users.pro_id, users.team_id
+        $sql = $sql = 'SELECT
+        users.user_id,
+        users.pro_id,
+        projects.project_name,
+        projects.project_status, 
+        teams.team_name
     FROM users
     INNER JOIN projects ON users.pro_id = projects.project_id
     INNER JOIN teams ON users.team_id = teams.team_id
     WHERE users.user_id = ?';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$this->userid]);
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    return $result;
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->userid]);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 }
 class UserLog
@@ -239,13 +259,7 @@ class UserLog
 }
 class userlogout
 {
-    function checklog()
-    {
-        if (!isset($_SESSION['user_id'])) {
-            header('location:login.php');
-            exit();
-        }
-    }
+
     function displayadm()
     {
         $conn = new Connection();
@@ -298,18 +312,6 @@ class userlogout
                 </div>
                 
              ';
-    }
-    function logout($logout)
-    {
-        if ($logout) {
-            session_start();
-            session_unset();
-            session_destroy();
-            header('location: login.php');
-        }
-    }
-    function displaypro($ownerid)
-    {
     }
 }
 
