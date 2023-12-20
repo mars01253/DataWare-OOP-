@@ -185,6 +185,7 @@
   <?php
     $scrum = new scrum();
     $result = $scrum->displaymembers();
+    $result2 = $scrum->displayteams();
     $i = 0;
     
     foreach ($result as $row) {
@@ -204,18 +205,26 @@
                <div >
                <div>
                <form method='post' action='scrum.php'>
-               <input value='$userid' name='teamid$i' class='hidden' id='teamid$i'>
+               <input value='$userid' name='usserid$i' class='hidden'>
                <input value='$projectid' name='projectid$i' class='hidden' id='projectid$i'>
-               <div class='ml-3 my-5 bg-blue-600 p-1 w-20 flex flex-col items-center '>
-                  <button class='uppercase text-xs leading-4 font-semibold text-center text-red-100 editteam'>Edit</button>
+               <div class='ml-3 my-5  p-1 w-20 flex flex-col items-center '>
+                  <select class='uppercase text-xs leading-4 font-semibold text-center text-black-100 w-[100%]' name='selectmember'>";
+                  foreach ($result2 as $row2) {
+                    $teamid = $row2['team_id'];
+                    $teamname = $row2['team_name'];
+                    $proid = $row2['pro_id'];
+                    echo "<option class='placeholder:font-light placeholder:text-xs focus:outline-none  ' value='$teamid'>$teamname</option>";
+                  }
+                  echo "</select>
+                  <input value='$proid' class='hidden' id='' name='projectid$i' >
                   <input value='$i' class='hidden' id='index' name='index' >
                </div>
             </div>
                </div>
             </div>
             <div>
-               <div class='ml-3 my-5 bg-red-600 p-1 w-20 flex flex-col items-center '>
-                  <input type='submit' name='delete' value='Delete' class='uppercase text-xs leading-4 font-semibold text-center text-red-100'>
+               <div class='ml-3 my-5 bg-green-600 p-1 w-20 flex flex-col items-center '>
+                  <input type='submit' name='confirm' value='confirm' class='uppercase text-xs leading-4 font-semibold text-center text-red-100'>
                </div>
                </form>
             </div>

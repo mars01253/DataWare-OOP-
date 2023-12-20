@@ -19,10 +19,19 @@ if (isset($_POST['submit'])) {
         exit;
 
 }if(isset($_POST['delete'])){
-    $i=$_POST['index'];
+    $i=$_POST['index2'];
     $teamid=$_POST['teamid'.$i];
     $scrum = new scrum($teamid);
     $scrum->delete($teamid);
+
+}
+if(isset($_POST['confirm'])){
+    $i=$_POST['index'];
+    $proid=$_POST['projectid'.$i];
+    $teamid=$_POST['selectmember'];
+    $usserid=$_POST['usserid'.$i];
+    $scrum = new scrum($proid , $teamid, $userid);
+    $scrum->assignmember($proid , $teamid, $userid);
 
 }
 $logout = "";

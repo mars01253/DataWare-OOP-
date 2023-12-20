@@ -99,7 +99,7 @@ class scrum extends user
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$this->name, 'active', $this->id, $this->projectmanager]);
     }
-    function modify($name , $proid, $id)
+    function modify($name, $proid, $id)
     {
         $this->id = $id;
         $this->name = $name;
@@ -111,11 +111,10 @@ class scrum extends user
         WHERE team_id = ?';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$this->name, $this->projectmanager,  $this->id]);
-        
     }
     function delete($teamid)
     {
-        $this->id=$teamid;
+        $this->id = $teamid;
         $conn = new Connection();
         $pdo = $conn->pdo;
         $sql = 'DELETE FROM teams WHERE team_id = ?';
@@ -135,16 +134,61 @@ class scrum extends user
     }
     function displaymembers()
     {
-        
+
         $conn = new Connection();
         $pdo = $conn->pdo;
-        $sql = 'SELECT * FROM users';
+        $sql = 'SELECT * FROM users where user_role ="membre"';
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+    function displayteams()
+    {
 
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'SELECT * FROM teams';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+    function assignmember($proid, $teamid, $userid)
+    {
+        $this->id = $proid;
+        $this->name = $teamid;
+        $this->projectmanager = $userid;
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'UPDATE users set user_status = "active" ,pro_id=?, team_id = ? where user_id = ? ';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$this->id, $this->name, $this->projectmanager]);
+    }
+}
+class member extends user
+{
+    private $userid;
+    public function __construct($userid = 0)
+    {
+        $this->userid = $userid;
+       
+    }
+    function displaymem($userid)
+    {
+        $this->userid = $userid;
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = '   SELECT users.pro_id, users.team_id
+    FROM users
+    INNER JOIN projects ON users.pro_id = projects.project_id
+    INNER JOIN teams ON users.team_id = teams.team_id
+    WHERE users.user_id = ?';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$this->userid]);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $result;
+    }
 }
 class UserLog
 {

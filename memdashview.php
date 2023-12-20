@@ -50,6 +50,49 @@
     </div>
   </div>
   <br>
+  <div>
+      <h1 class="xl:text-4xl text-3xl text-center text-gray-800 font-extrabold pb-6 sm:w-4/6 w-5/6 mx-auto">My Teams</h1>
+    </div>
+    <?php
+    $userid = $_SESSION['user_id'];
+    $member = new member();
+    $result= $member->displaymem($userid);
+    foreach ($result as $row) {
+      $teamname = $row['team_name'];
+      $projectname = $row['project_name'];
+      $projectstatus = $row['project_status'];
+      $teamid = $row['team_id'];
+      echo "<div>
+      <div class='bg-gray-100 mx-auto border-gray-500 border rounded-sm  text-gray-700 mb-0.5'>
+         <div class='flex p-3  border-l-8 border-red-600'>
+            <div class='flex-1'>
+               <div class='ml-3 space-y-1 border-r-2 pr-3'>
+                  <div class='text-base leading-6 font-normal' id='teamname$i'>$teamname</div>
+                  <div class='text-sm leading-4 font-normal'><span class='text-xs leading-4 font-normal text-gray-500'> Status : </span>$projectname</div>
+               </div>
+            </div>
+            <div class='border-r-2 pr-3'>
+               <div >
+               <div>
+               <form method='post' action='scrum.php'>
+               <div class='ml-3 my-5 bg-blue-600 p-1 w-20 flex flex-col items-center '>
+               <div class='text-base leading-6 font-normal' id='teamname$i'>$projectstatus</div>
+                  <input value='$i' class='hidden' id='index' name='index' >
+               </div>
+            </div>
+               </div>
+            </div>
+            <div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>";
+      $i++;
+    }
+
+     ?>
+ 
   <script src="mt.js"></script>
 </body>
 

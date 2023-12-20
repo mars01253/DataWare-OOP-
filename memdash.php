@@ -1,5 +1,6 @@
 <?php 
 require 'user.php';
+
 require 'memdashview.php';
 $logout = "";
 if(isset($_POST['logout'])){
