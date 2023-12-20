@@ -94,35 +94,36 @@
     </div>
   </div>
 
-  <div class="container mx-auto bg-gray-50 min-h-screen p-8 antialiased">
+  <div class="container mx-auto bg-gray-50 min-h-[50vh] p-8 antialiased">
     <?php
     $scrum = new scrum();
     $scrumid = $_SESSION['user_id'];
-    $scrum->display($scrumid);
+    $result = $scrum->display($scrumid);
     $i = 0;
     
-    while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      $teamname = $result['team_name'];
-      $teamstaus = $result['team_status'];
-      $projectid = $result['pro_id'];
-      $teamid = $result['team_id'];
+    foreach ($result as $row) {
+      $teamname = $row['team_name'];
+      $teamstaus = $row['team_status'];
+      $projectid = $row['pro_id'];
+      $teamid = $row['team_id'];
       echo "<div>
       <div class='bg-gray-100 mx-auto border-gray-500 border rounded-sm  text-gray-700 mb-0.5'>
          <div class='flex p-3  border-l-8 border-red-600'>
             <div class='flex-1'>
                <div class='ml-3 space-y-1 border-r-2 pr-3'>
-                  <div class='text-base leading-6 font-normal' id='projectname$i'>$teamname</div>
+                  <div class='text-base leading-6 font-normal' id='teamname$i'>$teamname</div>
                   <div class='text-sm leading-4 font-normal'><span class='text-xs leading-4 font-normal text-gray-500'> Status : </span>$teamstaus</div>
                </div>
             </div>
             <div class='border-r-2 pr-3'>
                <div >
                <div>
-               <form method='post'>
-               <input value='$teamid' class='hidden' id='projectdesc$i' >
+               <form method='post' action='scrum.php'>
+               <input value='$teamid' name='teamid$i' class='hidden' id='teamid$i'>
+               <input value='$projectid' name='projectid$i' class='hidden' id='projectid$i'>
                <div class='ml-3 my-5 bg-blue-600 p-1 w-20 flex flex-col items-center '>
-                  <button class='uppercase text-xs leading-4 font-semibold text-center text-red-100 editpro'>Edit</button>
-                  <input value='$i' class='hidden' name='index' >
+                  <button class='uppercase text-xs leading-4 font-semibold text-center text-red-100 editteam'>Edit</button>
+                  <input value='$i' class='hidden' id='index' name='index' >
                </div>
             </div>
                </div>
@@ -140,10 +141,148 @@
     }
 
     ?>
+       <div id="popup" class="fixed w-full h-full top-0 left-0  items-center flex justify-center hidden z-50">
+      <div class="bg-white w-full md:w-7/12 h-fit border-2 border-amber-600 flex flex-col justify-start items-center overflow-y-auto rounded-2xl md:h-fit">
+        <div class="bg-amber-600 w-full md:w-7/12 h-8 fixed rounded-tr-2xl rounded-tl-2xl">
+          <div class="flex justify-end">
+            <span onclick="closePopup()" class="text-2xl font-bold cursor-pointer mr-3">&times;</span>
+          </div>
+        </div>
+        <form method="post" action="scrum.php" class="flex flex-col justify-between items-center h-full mt-[10vh]">
+          <div class="flex flex-col mb-3">
+            <div class="flex flex-col border-2 border-[#A1A1A1] p-2 rounded-md">
+              <p class="text-xs">Team Name</p>
+              <input required class="placeholder:font-light placeholder:text-xs focus:outline-none" value="" id="editname" type="text" name="name" placeholder="Name" autocomplete="off">
+              <input required class="placeholder:font-light placeholder:text-xs focus:outline-none hidden" value=""  id="id" type="text" name="id" placeholder="Name" autocomplete="off">
+              <input required class="placeholder:font-light placeholder:text-xs focus:outline-none hidden" value=""  id="idpro" type="text" name="idpro" placeholder="Name" autocomplete="off">
+            </div>
+            <div id="categorynameERR" class="text-red-600 text-xs pl-3"></div>
+          </div>
+          <div class="flex flex-col mb-3">
+            <div class="flex flex-col border-2 border-[#A1A1A1] p-2 rounded-md">
+              <p class="text-xs">Assign a new Project</p>
+              <select class="placeholder:font-light placeholder:text-xs focus:outline-none" id="selectdiv" name="projectid">
+               
+              </select>
+            </div>
+            <div id="categorynameERR" class="text-red-600 text-xs pl-3"></div>
+          </div>
+          <div class="flex justify-end mb-4">
+            <input required type="submit" id="modifybtn" name="editsubmit" class="cursor-pointer px-8 py-2 bg-[#9fff30] font-semibold rounded-lg border-2 border-[#6da22f]" value="Edit Team">
+          </div>
+        </form>
+      </div>
+    </div>
 
+  </div>
+  <div id="storediv" class="hidden">
+</div>
+<div class="container flex justify-center mx-auto pt-16">
+    <div>
+      <h1 class="xl:text-4xl text-3xl text-center text-gray-800 font-extrabold pb-6 sm:w-4/6 w-5/6 mx-auto">Members</h1>
+    </div>
+  </div>
+  <?php
+    $scrum = new scrum();
+    $result = $scrum->displaymembers();
+    $i = 0;
+    
+    foreach ($result as $row) {
+      $userid = $row['user_id'];
+      $username = $row['user_fullname'];
+      $userstatus = $row['user_status'];
+      echo "<div>
+      <div class='bg-gray-100 mx-auto border-gray-500 border rounded-sm  text-gray-700 mb-0.5'>
+         <div class='flex p-3  border-l-8 border-red-600'>
+            <div class='flex-1'>
+               <div class='ml-3 space-y-1 border-r-2 pr-3'>
+                  <div class='text-base leading-6 font-normal' id='teamname$i'>$username</div>
+                  <div class='text-sm leading-4 font-normal'><span class='text-xs leading-4 font-normal text-gray-500'> Status : </span>$userstatus</div>
+               </div>
+            </div>
+            <div class='border-r-2 pr-3'>
+               <div >
+               <div>
+               <form method='post' action='scrum.php'>
+               <input value='$userid' name='teamid$i' class='hidden' id='teamid$i'>
+               <input value='$projectid' name='projectid$i' class='hidden' id='projectid$i'>
+               <div class='ml-3 my-5 bg-blue-600 p-1 w-20 flex flex-col items-center '>
+                  <button class='uppercase text-xs leading-4 font-semibold text-center text-red-100 editteam'>Edit</button>
+                  <input value='$i' class='hidden' id='index' name='index' >
+               </div>
+            </div>
+               </div>
+            </div>
+            <div>
+               <div class='ml-3 my-5 bg-red-600 p-1 w-20 flex flex-col items-center '>
+                  <input type='submit' name='delete' value='Delete' class='uppercase text-xs leading-4 font-semibold text-center text-red-100'>
+               </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>";
+      $i++;
+    }
 
-
+    ?>
   
 </body>
 
 </html>
+
+<script>
+  const editteam = document.querySelectorAll('.editteam');
+  editteam.forEach((team, index) => {
+    team.addEventListener('click', (e) => {
+      e.preventDefault(); 
+      document.getElementById("popup").classList.remove("hidden");
+      let teamname = document.getElementById("teamname" + index).innerHTML;
+      let teamid = document.getElementById("teamid" + index).value;
+      let proid = document.getElementById("projectid" + index).value;
+      /******************************************************************** */
+     
+      let editname = document.getElementById("editname");
+      let idteam = document.getElementById("id");
+      let idpro = document.getElementById("idpro");
+      let storediv = document.getElementById("storediv");
+      let selectdiv = document.getElementById("selectdiv");
+      editname.value = teamname;
+      idteam.value = teamid;
+      idpro.value=proid;
+      console.log("team name", editname.value);
+      console.log("team id",  idteam.value);
+      console.log("id pro", idpro.value);
+      let output = [];
+      let type = 'selectteam';
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', "config.php?type=" + type, true);
+      xhr.onload = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            output = xhr.response;
+            console.log(output);
+            for (let i = 0; i < output.length; i++) {
+              storediv.innerHTML += output[i];
+            }
+          }
+        }
+        selectdiv.innerHTML=storediv.innerText;
+      };
+      xhr.send();
+
+    });
+  });
+
+  function closePopup() {
+    document.getElementById("popup").classList.add("hidden");
+  }
+
+  window.onclick = function(event) {
+    var popup = document.getElementById("popup");
+    var popup2 = document.getElementById("popupEdit");
+    if (event.target == popup) {
+      popup.classList.add("hidden");
+    }
+  };
+</script>

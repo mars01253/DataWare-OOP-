@@ -99,21 +99,26 @@ class scrum extends user
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$this->name, 'active', $this->id, $this->projectmanager]);
     }
-    function modify()
+    function modify($name , $proid, $id)
     {
+        $this->id = $id;
+        $this->name = $name;
+        $this->projectmanager = $proid;
         $conn = new Connection();
         $pdo = $conn->pdo;
-        $sql = 'UPDATE projects 
-        SET project_name = ?, project_deadline = ?, project_desc = ? , project_manager = ?
-        WHERE project_id = ?';
+        $sql = 'UPDATE teams 
+        SET team_name = ?, pro_id = ?
+        WHERE team_id = ?';
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$this->name, $this->deadline,  $this->projectdesc, $this->projectmanager, $this->id]);
+        $stmt->execute([$this->name, $this->projectmanager,  $this->id]);
+        
     }
-    function delete()
+    function delete($teamid)
     {
+        $this->id=$teamid;
         $conn = new Connection();
         $pdo = $conn->pdo;
-        $sql = 'DELETE FROM projects WHERE project_id = ?';
+        $sql = 'DELETE FROM teams WHERE team_id = ?';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$this->id]);
     }
@@ -125,9 +130,21 @@ class scrum extends user
         $sql = 'SELECT * FROM teams WHERE scrum_id = ?';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$this->id]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $result;
     }
+    function displaymembers()
+    {
+        
+        $conn = new Connection();
+        $pdo = $conn->pdo;
+        $sql = 'SELECT * FROM users';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
 }
 class UserLog
 {
